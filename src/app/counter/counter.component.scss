@@ -1,0 +1,19 @@
+:host {
+	display: inline-block;
+	margin-top: 1rem;
+}
+.countdown-digit {
+	display: inline-block;
+	font-size: 3rem;
+	background: linear-gradient(0deg, black, black 30%, rgb(80,80,80) 46%, rgb(160,160,160) 50%, black 70%);
+	color: white;
+	width: 3rem;
+	border-radius: 8%;
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	//margin-left: 0.2rem;
+	margin-right: 0.2rem;
+	border-top: solid 3px grey;
+}
