@@ -9,8 +9,12 @@
           <md-icon>star</md-icon>
         </button>
       </div>
-      <div class="instagram-slideshow">
-        <swiper [config]="swiperConfig" *ngIf="isActualDay">
+      <div class="instagram-slideshow" #slideshow>
+        <button class="full-screen-btn" md-icon-button (click)="fullscreen()">
+          <md-icon *ngIf="!isFullscreen">fullscreen</md-icon>
+          <md-icon *ngIf="isFullscreen">fullscreen_exit</md-icon>
+        </button>
+        <swiper class="swiper" [config]="swiperConfig" *ngIf="isActualDay">
           <div class="swiper-wrapper">
             <div class="swiper-slide" *ngFor="let image of images; trackBy: trackPost">
               <div class="instagram-pic-holder">

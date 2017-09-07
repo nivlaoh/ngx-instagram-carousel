@@ -5,7 +5,7 @@
 .countdown-digit {
 	display: inline-block;
 	font-size: 3rem;
-	background: linear-gradient(0deg, black, black 30%, rgb(80,80,80) 46%, rgb(160,160,160) 50%, black 70%);
+	background: linear-gradient(0deg, rgb(100,100,100), black 30%, rgb(80,80,80) 46%, rgb(160,160,160) 50%, black 70%, rgb(100,100,100) 100%);
 	color: white;
 	width: 3rem;
 	border-radius: 8%;

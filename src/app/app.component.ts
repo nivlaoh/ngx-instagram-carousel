@@ -12,19 +12,18 @@ import { InstagramService } from './instagram.service';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-	title = 'app';
-	htmlContent: string = '';
 	images: any[];
-	@ViewChild('slider') container: ElementRef;
+	@ViewChild('slideshow') slideshow: ElementRef;
 	config = {};
 	swiperConfig = {
-		autoplay: 4000,
+		autoplay: 5000,
 		speed: 800,
 		autoplayDisableOnInteraction: true,
 		effect: 'fade',
 		fade: { crossFade: true },
 		loop: true
 	};
+	isFullscreen: boolean;
 	isActualDay: boolean;
 	weddingDate: number[];
 	private isAlive: boolean;
@@ -66,13 +65,13 @@ export class AppComponent implements OnInit, OnDestroy {
 			if (typeof this.images === 'undefined') {
 				this.images = r.tag.top_posts.nodes;
 			} else {
-				const temp: any[] = r.tag.top_posts.nodes;
-				const newImages = temp.filter(t => {
-					return this.images.includes(i => {
-						return i.id === t.id;
-					});
+				const loadedPics: any[] = r.tag.top_posts.nodes;
+				const newImages = loadedPics.filter(t => {
+					return this.images.findIndex(i => i.id === t.id) === -1;
 				});
-				this.images.unshift(newImages);
+				if (newImages.length > 0)
+					this.images = [...newImages, ...this.images];
+				console.log(this.images.length);
 			}
 			const hasNextPage: boolean = r.tag.media.page_info.has_next_page;
 			const cursor: string = r.tag.media.page_info.end_cursor;
@@ -86,5 +85,19 @@ export class AppComponent implements OnInit, OnDestroy {
 	sanitizeUrl(url: string) {
 		const c = this.domSanitizer.sanitize(SecurityContext.STYLE, url);
 		return c;
+	}
+
+	fullscreen() {
+		if (document.webkitFullscreenElement) {
+			document.webkitCancelFullScreen();
+			this.isFullscreen = false;
+		} else {
+			if (this.slideshow.nativeElement.requestFullscreen) {
+				this.slideshow.nativeElement.requestFullscreen();
+			} else {
+				this.slideshow.nativeElement.webkitRequestFullScreen();
+			}
+			this.isFullscreen = true;
+		}
 	}
 }
