@@ -6,5 +6,8 @@
 export const environment = {
 	production: false,
 	hashtag: 'wedding',
-	dateOfWedding: [28, 10, 2017]
+	title: 'Instagram Carousel',
+	dateOfWedding: [28, 10, 2017],
+	baseUrl: 'https://wedding-backend-nigkoqpmic.now.sh',
+	bufferBefore: 4,
 };

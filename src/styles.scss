@@ -15,6 +15,7 @@ html, body {
 	background: url(assets/lightpaper.png) mat-color(mat-palette($mat-blue-grey, 100));
 	width: 100%;
 	height: 100%;
+	box-sizing: border-box;
 }
 .gold-text {
 	color: #C8B89D;
@@ -22,10 +23,12 @@ html, body {
 	font-style: italic;
 	height: 100%;
 }
+.swiper-slide {
+	width: 100% !important;
+}
 .instagram-pic-holder {
 	position: relative;
 	width: 100%;
-	min-height: 350px;
 	height: 100%;
 }
 .blur-bg {
@@ -45,9 +48,6 @@ html, body {
 	background-size: cover;
 }
 .instagram-pic {
-	position: absolute;
-	left: 50%;
-	margin-left: -25%;
 	height: 100%;
 	z-index: 1;
 }

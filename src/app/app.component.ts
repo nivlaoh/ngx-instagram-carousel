@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, SecurityContext, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
+import { SwiperComponent } from 'angular2-useful-swiper';
 import { IntervalObservable } from 'rxjs/observable/IntervalObservable';
 import 'rxjs/add/operator/takeWhile';
 
@@ -14,7 +15,11 @@ import { InstagramService } from './instagram.service';
 export class AppComponent implements OnInit, OnDestroy {
 	images: any[];
 	@ViewChild('slideshow') slideshow: ElementRef;
+	@ViewChild('swiper') swiper: SwiperComponent;
 	config = {};
+	title: string;
+	hashtag: string;
+	pageToken: string = null;
 	swiperConfig = {
 		autoplay: 5000,
 		speed: 800,
@@ -32,18 +37,21 @@ export class AppComponent implements OnInit, OnDestroy {
 		private instaService: InstagramService) {
 		this.isAlive = true;
 		this.weddingDate = [];
+		this.images = [];
 	}
 
 	ngOnInit() {
-		this.getPublicHashtags();
+		this.getPublicHashtags(true);
 		this.isActualDay = this.eventIsLive(new Date());
+		this.hashtag = environment.hashtag;
+		this.title = environment.title;
 
 		IntervalObservable.create(10000)
 			.takeWhile(() => this.isAlive)
 			.subscribe(() => {
-				this.isActualDay = this.eventIsLive(new Date());
+				this.isActualDay = true; // this.eventIsLive(new Date());
 				if (this.isActualDay)
-					this.getPublicHashtags()
+					this.getPublicHashtags();
 			});
 	}
 
@@ -59,23 +67,37 @@ export class AppComponent implements OnInit, OnDestroy {
 		} else return false;
 	}
 
-	getPublicHashtags() {
-		this.instaService.getInstagramPostsByHashtags(environment.hashtag).subscribe(r => {
-			console.log(r);
-			if (typeof this.images === 'undefined') {
-				this.images = r.tag.top_posts.nodes;
-			} else {
-				const loadedPics: any[] = r.tag.top_posts.nodes;
-				const newImages = loadedPics.filter(t => {
-					return this.images.findIndex(i => i.id === t.id) === -1;
-				});
-				if (newImages.length > 0)
-					this.images = [...newImages, ...this.images];
-				console.log(this.images.length);
-			}
-			const hasNextPage: boolean = r.tag.media.page_info.has_next_page;
-			const cursor: string = r.tag.media.page_info.end_cursor;
-		});
+	getPublicHashtags(init: boolean = false) {
+		let playRemaining = 0;
+		let currIndex = 0;
+		if (typeof this.swiper !== 'undefined') {
+			currIndex = this.swiper.swiper.activeIndex;
+			playRemaining = this.images.length - (currIndex + 1);
+		}
+		if (init || playRemaining <= environment.bufferBefore) {
+			this.instaService.getInstagramPostsByHashtags(environment.hashtag, this.pageToken).subscribe(r => {
+				console.log(r);
+				// update page token
+				if (r.tag.media.page_info.has_next_page) {
+					this.pageToken = r.tag.media.page_info.end_cursor;
+					console.log('update page token', this.pageToken);
+				}
+
+				if (this.images.length === 0) {
+					this.images = r.tag.media.nodes;
+					// this.swiper.swiper.startAutoplay();
+				} else {
+					const loadedPics: any[] = r.tag.media.nodes;
+					const newImages = loadedPics.filter(t => {
+						return this.images.findIndex(i => i.id === t.id) === -1;
+					});
+					if (newImages.length > 0) {
+						this.images.splice.apply(this.images, [currIndex, 0].concat(newImages));
+					}
+					console.log('Currently at:', currIndex, this.images.length);
+				}
+			});
+		}
 	}
 
 	trackPost(index: number, item: any) {

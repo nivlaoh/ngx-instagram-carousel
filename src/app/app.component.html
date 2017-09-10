@@ -1,23 +1,22 @@
 <md-toolbar color="primary" fxLayout="row" fxLayoutAlign="center center">
-  <span class="cursive-title"><md-icon>favorite</md-icon> Alvin &amp; Baohui's Wedding <md-icon>favorite</md-icon></span>
+  <span class="cursive-title" class.lt-md="cursive-title small" fxFlex>
+    <md-icon color="accent">favorite</md-icon>
+    {{title}}
+    <md-icon color="accent">favorite</md-icon>
+  </span>
 </md-toolbar>
 <div class="body-container" fxLayout="row" fxLayoutAlign="center center">
-  <md-card class="wedding-card" fxFlex="60%">
+  <md-card class="wedding-card" fxFlex="60%" fxFlex.lt-md="100%">
     <md-card-content>
-      <div class="fab-holder">
-        <button md-fab color="accent">
-          <md-icon>star</md-icon>
-        </button>
-      </div>
       <div class="instagram-slideshow" #slideshow>
-        <button class="full-screen-btn" md-icon-button (click)="fullscreen()">
+        <button class="full-screen-btn mat-elevation-z6" md-icon-button (click)="fullscreen()" mdTooltip="Toggle Fullscreen">
           <md-icon *ngIf="!isFullscreen">fullscreen</md-icon>
           <md-icon *ngIf="isFullscreen">fullscreen_exit</md-icon>
         </button>
-        <swiper class="swiper" [config]="swiperConfig" *ngIf="isActualDay">
+        <swiper class="swiper" [config]="swiperConfig" #swiper *ngIf="isActualDay">
           <div class="swiper-wrapper">
             <div class="swiper-slide" *ngFor="let image of images; trackBy: trackPost">
-              <div class="instagram-pic-holder">
+              <div class="instagram-pic-holder" fxLayout="row" fxLayoutAlign="center center">
                 <div class="blur-bg" [ngStyle]="{'background-image': sanitizeUrl('url(' + image?.display_src + ')')}"></div>
                 <img class="instagram-pic" [src]="image?.display_src">
                 <div class="instagram-comments">
@@ -29,10 +28,15 @@
         </swiper>
         <div class="prepare-text" *ngIf="!isActualDay" fxLayout="column" fxLayoutAlign="center center">
           <div>Wedding will commence on:</div>
-          <div>
+          <div fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="center center">
             <app-counter [count]="weddingDate[0]"></app-counter> - 
             <app-counter [count]="weddingDate[1]"></app-counter> - 
             <app-counter [count]="weddingDate[2]"></app-counter>
+          </div>
+          <div>Hashtag
+            <md-chip-list>
+              <md-chip color="primary" selected="true">#{{hashtag}}</md-chip>
+            </md-chip-list> to see photos added to the stream
           </div>
         </div>
       </div>
