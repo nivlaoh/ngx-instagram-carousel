@@ -80,12 +80,11 @@ export class AppComponent implements OnInit, OnDestroy {
 				// update page token
 				if (r.tag.media.page_info.has_next_page) {
 					this.pageToken = r.tag.media.page_info.end_cursor;
-					console.log('update page token', this.pageToken);
+					// console.log('update page token', this.pageToken);
 				}
 
 				if (this.images.length === 0) {
 					this.images = r.tag.media.nodes;
-					// this.swiper.swiper.startAutoplay();
 				} else {
 					const loadedPics: any[] = r.tag.media.nodes;
 					const newImages = loadedPics.filter(t => {
@@ -109,15 +108,30 @@ export class AppComponent implements OnInit, OnDestroy {
 		return c;
 	}
 
+	sanitizeSrc(url: string) {
+		const c = this.domSanitizer.sanitize(SecurityContext.URL, url);
+		return c;
+	}
+
 	fullscreen() {
-		if (document.webkitFullscreenElement) {
-			document.webkitCancelFullScreen();
+		if (this.isFullscreen) {
+			if (document.exitFullscreen) { document.exitFullscreen(); }
+			else if ((<any>document).mozCancelFullScreen) { (<any>document).mozCancelFullScreen(); }
+			else if ((<any>document).webkitExitFullScreen) { (<any>document).webkitExitFullScreen(); }
+			else if (document.webkitCancelFullScreen) { document.webkitCancelFullScreen(); }
+			else if ((<any>document).msExitFullscreen) { (<any>document).msExitFullscreen(); }
 			this.isFullscreen = false;
 		} else {
 			if (this.slideshow.nativeElement.requestFullscreen) {
 				this.slideshow.nativeElement.requestFullscreen();
-			} else {
+			} else if (this.slideshow.nativeElement.mozRequestFullScreen) {
+				this.slideshow.nativeElement.mozRequestFullScreen();
+			} else if (this.slideshow.nativeElement.webkitRequestFullScreen) {
 				this.slideshow.nativeElement.webkitRequestFullScreen();
+			} else if (this.slideshow.nativeElement.msRequestFullscreen) {
+				this.slideshow.nativeElement.msRequestFullscreen();
+			} else {
+				console.log('Full screen not supported');
 			}
 			this.isFullscreen = true;
 		}

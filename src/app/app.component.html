@@ -18,7 +18,7 @@
             <div class="swiper-slide" *ngFor="let image of images; trackBy: trackPost">
               <div class="instagram-pic-holder" fxLayout="row" fxLayoutAlign="center center">
                 <div class="blur-bg" [ngStyle]="{'background-image': sanitizeUrl('url(' + image?.display_src + ')')}"></div>
-                <img class="instagram-pic" [src]="image?.display_src">
+                <img class="instagram-pic" [src]="sanitizeSrc(image?.display_src)">
                 <div class="instagram-comments">
                   {{image?.caption}}
                 </div>
@@ -33,8 +33,8 @@
             <app-counter [count]="weddingDate[1]"></app-counter> - 
             <app-counter [count]="weddingDate[2]"></app-counter>
           </div>
-          <div>Hashtag
-            <md-chip-list>
+          <div fxLayoutAlign="center center">Hashtag
+            <md-chip-list style="margin-left: 0.5rem; margin-right: 0.5rem;">
               <md-chip color="primary" selected="true">#{{hashtag}}</md-chip>
             </md-chip-list> to see photos added to the stream
           </div>
