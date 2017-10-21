@@ -8,6 +8,6 @@ export const environment = {
 	hashtag: 'wedding',
 	title: 'Instagram Carousel',
 	dateOfWedding: [28, 10, 2017],
-	baseUrl: 'https://wedding-backend-nigkoqpmic.now.sh',
+	baseUrl: 'https://hoheartedlee.herokuapp.com',
 	bufferBefore: 4,
 };

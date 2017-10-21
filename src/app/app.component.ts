@@ -20,6 +20,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	title: string;
 	hashtag: string;
 	pageToken: string = null;
+	bgStyleUrl: string;
 	swiperConfig = {
 		autoplay: 5000,
 		speed: 800,
@@ -31,6 +32,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	isFullscreen: boolean;
 	isActualDay: boolean;
 	weddingDate: number[];
+	playRemaining: number = 0;
 	private isAlive: boolean;
 
 	constructor(private domSanitizer: DomSanitizer,
@@ -68,34 +70,39 @@ export class AppComponent implements OnInit, OnDestroy {
 	}
 
 	getPublicHashtags(init: boolean = false) {
-		let playRemaining = 0;
+		// check new posts
+		this.instaService.getInstagramPostsByHashtags(environment.hashtag).subscribe(r => this.processPosts(r, true));
+		// load more if needed
+		if (this.playRemaining <= environment.bufferBefore) {
+			this.instaService.getInstagramPostsByHashtags(environment.hashtag, this.pageToken).subscribe(r => this.processPosts(r));
+		}
+	}
+
+	processPosts(r: any, init: boolean = false) {
 		let currIndex = 0;
 		if (typeof this.swiper !== 'undefined') {
 			currIndex = this.swiper.swiper.activeIndex;
-			playRemaining = this.images.length - (currIndex + 1);
+			this.playRemaining = this.images.length - (currIndex + 1);
 		}
-		if (init || playRemaining <= environment.bufferBefore) {
-			this.instaService.getInstagramPostsByHashtags(environment.hashtag, this.pageToken).subscribe(r => {
-				console.log(r);
-				// update page token
-				if (r.tag.media.page_info.has_next_page) {
-					this.pageToken = r.tag.media.page_info.end_cursor;
-					// console.log('update page token', this.pageToken);
-				}
 
-				if (this.images.length === 0) {
-					this.images = r.tag.media.nodes;
-				} else {
-					const loadedPics: any[] = r.tag.media.nodes;
-					const newImages = loadedPics.filter(t => {
-						return this.images.findIndex(i => i.id === t.id) === -1;
-					});
-					if (newImages.length > 0) {
-						this.images.splice.apply(this.images, [currIndex, 0].concat(newImages));
-					}
-					console.log('Currently at:', currIndex, this.images.length);
-				}
+		console.log(r);
+		// update page token only if not checking for 1st page updates
+		if (!init && r.tag.media.page_info.has_next_page) {
+			this.pageToken = r.tag.media.page_info.end_cursor;
+			console.log('update page token', this.pageToken);
+		}
+
+		if (this.images.length === 0) {
+			this.images = r.tag.media.nodes;
+		} else {
+			const loadedPics: any[] = r.tag.media.nodes;
+			const newImages = loadedPics.filter(t => {
+				return this.images.findIndex(i => i.id === t.id) === -1;
 			});
+			if (newImages.length > 0) {
+				this.images.splice.apply(this.images, [currIndex, 0].concat(newImages));
+			}
+			console.log('Currently at:', currIndex, this.images.length);
 		}
 	}
 
