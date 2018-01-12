@@ -1,27 +1,29 @@
-<md-toolbar color="primary" fxLayout="row" fxLayoutAlign="center center">
+<mat-toolbar color="primary" fxLayout="row" fxLayoutAlign="center center">
   <span class="cursive-title" class.lt-md="cursive-title small" fxFlex>
-    <md-icon color="accent">favorite</md-icon>
+    <mat-icon color="accent">favorite</mat-icon>
     {{title}}
-    <md-icon color="accent">favorite</md-icon>
+    <mat-icon color="accent">favorite</mat-icon>
   </span>
-</md-toolbar>
+</mat-toolbar>
 <div class="body-container" fxLayout="row" fxLayoutAlign="center center">
-  <md-card class="wedding-card" fxFlex="60%" fxFlex.lt-md="100%">
-    <md-card-content>
+  <mat-card class="wedding-card" fxFlex="60%" fxFlex.lt-md="100%">
+    <mat-card-content>
       <div class="instagram-slideshow" #slideshow>
-        <button class="full-screen-btn mat-elevation-z6" md-icon-button (click)="fullscreen()" mdTooltip="Toggle Fullscreen">
-          <md-icon *ngIf="!isFullscreen">fullscreen</md-icon>
-          <md-icon *ngIf="isFullscreen">fullscreen_exit</md-icon>
+        <button class="full-screen-btn mat-elevation-z6" mat-icon-button (click)="fullscreen()" mdTooltip="Toggle Fullscreen">
+          <mat-icon *ngIf="!isFullscreen">fullscreen</mat-icon>
+          <mat-icon *ngIf="isFullscreen">fullscreen_exit</mat-icon>
         </button>
         <swiper class="swiper" [config]="swiperConfig" #swiper *ngIf="isActualDay">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide" *ngFor="let image of images; trackBy: trackPost">
-              <div class="instagram-pic-holder" fxLayout="row" fxLayoutAlign="center center">
-                <div class="blur-bg" [ngStyle]="{'background-image': sanitizeUrl('url(' + image?.display_src + ')')}"></div>
-                <img class="instagram-pic" [src]="sanitizeSrc(image?.display_src)">
-                <div class="instagram-comments">
-                  {{image?.caption}}
-                </div>
+          <div *ngFor="let image of images; trackBy: trackPost">
+            <div class="instagram-pic-holder" fxLayout="row" fxLayoutAlign="center center">
+              <div class="blur-bg" [style.background-image]="sanitizeUrl(image?.node?.display_url)"></div>
+              <img class="instagram-pic" *ngIf="!image?.node?.is_video" data-src="{{image?.node?.display_url}}">
+              <video class="instagram-pic" *ngIf="image?.node?.is_video">
+                <source [src]="image?.node?.display_url" type="video/mp4">
+                  Your browser does not support video tag.
+              </video>
+              <div class="instagram-comments">
+                {{image?.node?.edge_media_to_caption?.edges[0]?.node.text}}
               </div>
             </div>
           </div>
@@ -34,12 +36,12 @@
             <app-counter [count]="weddingDate[2]"></app-counter>
           </div>
           <div fxLayoutAlign="center center">Hashtag
-            <md-chip-list style="margin-left: 0.5rem; margin-right: 0.5rem;">
-              <md-chip color="primary" selected="true">#{{hashtag}}</md-chip>
-            </md-chip-list> to see photos added to the stream
+            <mat-chip-list style="margin-left: 0.5rem; margin-right: 0.5rem;">
+              <mat-chip color="primary" selected="true">#{{hashtag}}</mat-chip>
+            </mat-chip-list> to see photos added to the stream
           </div>
         </div>
       </div>
-    </md-card-content>
-  </md-card>
+    </mat-card-content>
+  </mat-card>
 </div>

@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, SecurityContext, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
-import { SwiperComponent } from 'angular2-useful-swiper';
+//import { SwiperComponent } from 'angular2-useful-swiper';
+import { SwiperConfigInterface, SwiperDirective } from 'ngx-swiper-wrapper';
 import { IntervalObservable } from 'rxjs/observable/IntervalObservable';
 import 'rxjs/add/operator/takeWhile';
 
@@ -15,24 +16,35 @@ import { InstagramService } from './instagram.service';
 export class AppComponent implements OnInit, OnDestroy {
 	images: any[];
 	@ViewChild('slideshow') slideshow: ElementRef;
-	@ViewChild('swiper') swiper: SwiperComponent;
+	@ViewChild('swiper') swiper: any;
+	swiperInstance: any;
 	config = {};
 	title: string;
 	hashtag: string;
 	pageToken: string = null;
 	bgStyleUrl: string;
-	swiperConfig = {
-		autoplay: 5000,
+	swiperConfig: SwiperConfigInterface = {
+		autoplay: {
+			delay: 6000,
+			stopOnLast: false,
+			disableOnInteraction: true
+		},
 		speed: 800,
-		autoplayDisableOnInteraction: true,
 		effect: 'fade',
-		fade: { crossFade: true },
-		loop: true
+		fadeEffect: { crossFade: true },
+		loop: true,
+		preloadImages: false,
+		lazy: {
+			loadPrevNext: true,
+			loadOnTransitionStart: true
+		}
 	};
 	isFullscreen: boolean;
 	isActualDay: boolean;
 	weddingDate: number[];
 	playRemaining: number = 0;
+	errorCount: number = 0;
+	capNumber: number = 500;
 	private isAlive: boolean;
 
 	constructor(private domSanitizer: DomSanitizer,
@@ -44,14 +56,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
 	ngOnInit() {
 		this.getPublicHashtags(true);
-		this.isActualDay = this.eventIsLive(new Date());
+		this.isActualDay = true; //this.eventIsLive(new Date());
 		this.hashtag = environment.hashtag;
 		this.title = environment.title;
 
 		IntervalObservable.create(10000)
-			.takeWhile(() => this.isAlive)
+			.takeWhile(() => this.isAlive || this.images.length >= this.capNumber)
 			.subscribe(() => {
-				this.isActualDay = true; // this.eventIsLive(new Date());
 				if (this.isActualDay)
 					this.getPublicHashtags();
 			});
@@ -71,7 +82,12 @@ export class AppComponent implements OnInit, OnDestroy {
 
 	getPublicHashtags(init: boolean = false) {
 		// check new posts
-		this.instaService.getInstagramPostsByHashtags(environment.hashtag).subscribe(r => this.processPosts(r, true));
+		this.instaService.getInstagramPostsByHashtags(environment.hashtag)
+			.subscribe(r => this.processPosts(r, true), e => {
+				console.error('error count', ++this.errorCount);
+				if (this.errorCount >= 3)
+					this.isAlive = false;
+			});
 		// load more if needed
 		if (this.playRemaining <= environment.bufferBefore) {
 			this.instaService.getInstagramPostsByHashtags(environment.hashtag, this.pageToken).subscribe(r => this.processPosts(r));
@@ -80,38 +96,45 @@ export class AppComponent implements OnInit, OnDestroy {
 
 	processPosts(r: any, init: boolean = false) {
 		let currIndex = 0;
+		this.errorCount = 0;
+
 		if (typeof this.swiper !== 'undefined') {
-			currIndex = this.swiper.swiper.activeIndex;
+			this.swiperInstance = this.swiper.directiveRef.swiper();
+			currIndex = this.swiperInstance.activeIndex;
 			this.playRemaining = this.images.length - (currIndex + 1);
 		}
 
-		console.log(r);
+		console.log('posts', r, this.swiper);
 		// update page token only if not checking for 1st page updates
-		if (!init && r.tag.media.page_info.has_next_page) {
-			this.pageToken = r.tag.media.page_info.end_cursor;
-			console.log('update page token', this.pageToken);
-		}
-
-		if (this.images.length === 0) {
-			this.images = r.tag.media.nodes;
-		} else {
-			const loadedPics: any[] = r.tag.media.nodes;
-			const newImages = loadedPics.filter(t => {
-				return this.images.findIndex(i => i.id === t.id) === -1;
-			});
-			if (newImages.length > 0) {
-				this.images.splice.apply(this.images, [currIndex, 0].concat(newImages));
+		if (r.graphql) {
+			const media = r.graphql.hashtag.edge_hashtag_to_media;
+			if (!init && media.page_info.has_next_page) {
+				this.pageToken = media.page_info.end_cursor;
+				console.log('update page token', this.pageToken);
 			}
-			console.log('Currently at:', currIndex, this.images.length);
+
+			if (this.images.length === 0) {
+				this.images = media.edges;
+			} else {
+				const loadedPics: any[] = media.edges;
+				const newImages = loadedPics.filter(t => {
+					return this.images.findIndex(i => i.node.id === t.node.id) === -1;
+				});
+				if (newImages.length > 0) {
+					// this.images.splice.apply(this.images, [currIndex, 0].concat(newImages));
+					this.images.splice(currIndex+1, 0, ...newImages);
+				}
+				console.log('Currently at:', currIndex, this.images.length);
+			}
 		}
 	}
 
 	trackPost(index: number, item: any) {
-		return item.id;
+		return item.node.id;
 	}
 
 	sanitizeUrl(url: string) {
-		const c = this.domSanitizer.sanitize(SecurityContext.STYLE, url);
+		const c = this.domSanitizer.bypassSecurityTrustStyle(`url(${url})`);
 		return c;
 	}
 

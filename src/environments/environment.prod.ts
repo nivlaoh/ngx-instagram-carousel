@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  hashtag: 'hoheartedlee2017',
-  title: 'Alvin & Baohui\'s Wedding',
-  dateOfWedding: [28, 10, 2017],
-  baseUrl: 'https://hoheartedlee.herokuapp.com',
+  hashtag: 'vincexmich',
+  title: 'Vincent & Michelle\'s Wedding',
+  dateOfWedding: [4, 3, 2018],
+  baseUrl: 'http://sentinel-wood.hokaicheng.com:3000',
   bufferBefore: 4
 };

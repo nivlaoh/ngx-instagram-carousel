@@ -21,6 +21,7 @@ export class CounterComponent implements OnInit {
 			this.digits.unshift(counter % 10);
 			counter = Math.floor(counter / 10);
 		} while (counter > 0);
+		if (this.count < 10) this.digits.unshift(0);
 	}
 
 }
