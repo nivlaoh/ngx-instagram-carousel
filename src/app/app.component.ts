@@ -26,7 +26,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	swiperConfig: SwiperConfigInterface = {
 		autoplay: {
 			delay: 6000,
-			stopOnLast: false,
+			stopOnLastSlide: false,
 			disableOnInteraction: true
 		},
 		speed: 800,
