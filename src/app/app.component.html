@@ -8,12 +8,12 @@
 <div class="body-container" fxLayout="row" fxLayoutAlign="center center">
   <mat-card class="wedding-card" fxFlex="60%" fxFlex.lt-md="100%">
     <mat-card-content>
-      <div class="instagram-slideshow" #slideshow>
+      <div class="instagram-slideshow" #slideshow *ngIf="images.length > 0">
         <button class="full-screen-btn mat-elevation-z6" mat-icon-button (click)="fullscreen()" mdTooltip="Toggle Fullscreen">
           <mat-icon *ngIf="!isFullscreen">fullscreen</mat-icon>
           <mat-icon *ngIf="isFullscreen">fullscreen_exit</mat-icon>
         </button>
-        <swiper class="swiper" [config]="swiperConfig" #swiper *ngIf="isActualDay">
+        <swiper class="swiper" [config]="swiperConfig" #swiper *ngIf="isActualDay" (indexChange)="calculateNextLoad()" [(index)]="currentFrame">
           <div *ngFor="let image of images; trackBy: trackPost">
             <div class="instagram-pic-holder" fxLayout="row" fxLayoutAlign="center center">
               <div class="blur-bg" [style.background-image]="sanitizeUrl(image?.node?.display_url)"></div>
@@ -22,7 +22,7 @@
                 <source [src]="image?.node?.display_url" type="video/mp4">
                   Your browser does not support video tag.
               </video>
-              <div class="instagram-comments">
+              <div class="instagram-comments" *ngIf="showDescription">
                 {{image?.node?.edge_media_to_caption?.edges[0]?.node.text}}
               </div>
             </div>
@@ -35,9 +35,9 @@
             <app-counter [count]="weddingDate[1]"></app-counter> - 
             <app-counter [count]="weddingDate[2]"></app-counter>
           </div>
-          <div fxLayoutAlign="center center">Hashtag
+          <div fxLayoutAlign="center center">Hashtag(s)
             <mat-chip-list style="margin-left: 0.5rem; margin-right: 0.5rem;">
-              <mat-chip color="primary" selected="true">#{{hashtag}}</mat-chip>
+              <mat-chip color="primary" selected="true" *ngFor="let tag of hashtags">#{{tag}}</mat-chip>
             </mat-chip-list> to see photos added to the stream
           </div>
         </div>
