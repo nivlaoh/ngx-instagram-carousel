@@ -1,8 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { HttpModule, JsonpModule } from '@angular/http';
-// import { SwiperModule } from 'angular2-useful-swiper';
+import { HttpClientModule } from '@angular/common/http';
 import 'hammerjs';
 import { PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarModule, PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import { SWIPER_CONFIG, SwiperConfigInterface, SwiperModule } from 'ngx-swiper-wrapper';
@@ -29,8 +28,7 @@ const DEFAULT_SWIPER_CONFIG: SwiperConfigInterface = {
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    HttpModule,
-    JsonpModule,
+    HttpClientModule,
     SharedModule,
     PerfectScrollbarModule,
     SwiperModule
