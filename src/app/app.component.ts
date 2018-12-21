@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { SwiperComponent, SwiperConfigInterface } from 'ngx-swiper-wrapper';
 import { IntervalObservable } from 'rxjs/observable/IntervalObservable';
@@ -10,7 +10,8 @@ import { InstagramService } from './instagram.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit, OnDestroy {
 	images: any[];
@@ -28,8 +29,7 @@ export class AppComponent implements OnInit, OnDestroy {
 		lazy: {
 			loadPrevNext: true,
 			loadOnTransitionStart: true
-		},
-		observer: true
+		}
 	};
 	isFullscreen: boolean;
 	isActualDay: boolean;
@@ -41,7 +41,8 @@ export class AppComponent implements OnInit, OnDestroy {
 	showDescription: boolean;
 
 	constructor(private domSanitizer: DomSanitizer,
-		private instaService: InstagramService) {
+		private instaService: InstagramService,
+		private cdRef: ChangeDetectorRef) {
 		this.isAlive = true;
 		this.weddingDate = [];
 		this.images = [];
@@ -51,19 +52,23 @@ export class AppComponent implements OnInit, OnDestroy {
 		this.isActualDay = true; // this.eventIsLive(new Date());
 		this.title = environment.title;
 		this.showDescription = environment.showDescription;
-    this.getPublicHashtags(true);
+	    this.getPublicHashtags(true);
 
-    IntervalObservable.create(environment.refreshTiming)
-      .takeWhile(() => this.isAlive || this.images.length >= this.capNumber)
-      .subscribe(() => {
-        if (this.isActualDay) {
-          this.getPublicHashtags();
-        }
-      });
+	    IntervalObservable.create(environment.refreshTiming)
+			.takeWhile(() => this.isAlive || this.images.length >= this.capNumber)
+			.subscribe(() => {
+				if (this.isActualDay) {
+					this.getPublicHashtags();
+				}
+			});
 	}
 
 	ngOnDestroy() {
 		this.isAlive = false;
+	}
+
+	ngAfterViewInit() {
+		this.cdRef.detectChanges();
 	}
 
 	private eventIsLive(d: Date): boolean {
@@ -72,8 +77,8 @@ export class AppComponent implements OnInit, OnDestroy {
 			&& d.getDay() >= this.weddingDate[0]) {
 			return true;
 		} else {
-		  return false;
-    }
+			return false;
+    	}
 	}
 
 	getPublicHashtags(init: boolean = false) {
@@ -91,7 +96,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	}
 
 	processResponse(r: any, init: boolean = false) {
-		console.log('see responses', r, init);
+		console.log('see responses', r, 'init', init);
 		this.errorCount = 0;
 
 		r.forEach(posts => this.processPosts(posts, init, this.currentFrame));
@@ -100,8 +105,8 @@ export class AppComponent implements OnInit, OnDestroy {
 	processError(e) {
 		console.error('error count', ++this.errorCount, e);
 		if (this.errorCount >= 3) {
-      this.isAlive = false;
-    }
+    		this.isAlive = false;
+    	}
 	}
 
 	processPosts(r: any, init: boolean = false, currIndex) {
@@ -133,9 +138,9 @@ export class AppComponent implements OnInit, OnDestroy {
 				});
 				if (newImages.length > 0) {
 					// this.images.splice.apply(this.images, [currIndex, 0].concat(newImages));
-					console.log('Inserting ', newImages.length, 'images in at ', currIndex);
-					this.images.splice(currIndex+1, 0, ...newImages);
-					this.swiper!!.directiveRef!!.update();
+					console.log('Inserting', newImages.length, 'images in at', currIndex);
+					this.images.splice(currIndex + 2, 0, ...newImages);
+					this.cdRef.detectChanges();
 				}
 				console.log('Current Pic Frame:', currIndex + 1, 'of', this.images.length);
 			}

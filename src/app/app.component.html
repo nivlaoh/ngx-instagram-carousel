@@ -8,7 +8,7 @@
 <div class="body-container" fxLayout="row" fxLayoutAlign="center center">
   <mat-card class="wedding-card" fxFlex="60%" fxFlex.lt-md="100%">
     <mat-card-content>
-      <div class="instagram-slideshow" #slideshow *ngIf="images.length > 0">
+      <div class="instagram-slideshow" #slideshow>
         <button class="full-screen-btn mat-elevation-z6" mat-icon-button (click)="fullscreen()" mdTooltip="Toggle Fullscreen">
           <mat-icon *ngIf="!isFullscreen">fullscreen</mat-icon>
           <mat-icon *ngIf="isFullscreen">fullscreen_exit</mat-icon>
