@@ -6,6 +6,6 @@ export const environment = {
   baseUrl: 'http://sentinel-wood.hokaicheng.com:3000',
   bufferBefore: 4,
   showDescription: false,
-  slideTiming: 6000,
+  slideTiming: 8000,
   refreshTiming: 10000
 };
