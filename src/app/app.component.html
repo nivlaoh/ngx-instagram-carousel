@@ -4,6 +4,11 @@
     {{title}}
     <mat-icon color="accent">favorite</mat-icon>
   </span>
+  <span>
+    <button class="download-btn mat-elevation-z6" mat-icon-button (click)="downloadPhotos()" mdTooltip="Download photos">
+      <mat-icon>get_app</mat-icon>
+    </button>
+  </span>
 </mat-toolbar>
 <div class="body-container" fxLayout="row" fxLayoutAlign="center center">
   <mat-card class="wedding-card" fxFlex="60%" fxFlex.lt-md="100%">

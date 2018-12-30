@@ -9,6 +9,7 @@ export const environment = {
 	title: 'Instagram Carousel',
 	dateOfWedding: [28, 10, 2017],
 	baseUrl: 'http://sentinel-wood.hokaicheng.com:3000',
+	//baseUrl: 'http://localhost:9000',
 	bufferBefore: 4,
 	showDescription: false,
 	slideTiming: 8000,

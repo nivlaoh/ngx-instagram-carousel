@@ -139,7 +139,7 @@ export class AppComponent implements OnInit, OnDestroy {
 				if (newImages.length > 0) {
 					// this.images.splice.apply(this.images, [currIndex, 0].concat(newImages));
 					console.log('Inserting', newImages.length, 'images in at', currIndex);
-					this.images.splice(currIndex + 2, 0, ...newImages);
+					this.images.splice(currIndex + 3, 0, ...newImages);
 					this.cdRef.detectChanges();
 				}
 				console.log('Current Pic Frame:', currIndex + 1, 'of', this.images.length);
@@ -182,5 +182,33 @@ export class AppComponent implements OnInit, OnDestroy {
 			}
 			this.isFullscreen = true;
 		}
+	}
+
+	downloadPhotos() {
+		this.instaService.downloadPhotos(environment.hashtags[0])
+			.subscribe(r => {
+				console.log('downloaded', r, r.headers);
+				const url = window.URL.createObjectURL(r.body);
+				const link = document.createElement('a');
+				link.setAttribute('href', url);
+				link.setAttribute('download', this.getDownloadFilename(r));
+				document.body.appendChild(link);
+				link.click();
+			}, this.processError);
+	}
+
+	getDownloadFilename(response) {
+	    let filename = "";
+	    const disposition = response.headers.get('Content-Disposition');
+	    console.log('disposition', disposition);
+	    if (disposition && disposition.indexOf('attachment') !== -1) {
+	        const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+	        const matches = filenameRegex.exec(disposition);
+	        if (matches != null && matches[1]) { 
+	          filename = matches[1].replace(/['"]/g, '');
+	        }
+	    }
+	    console.log('filename', filename);
+	    return filename;
 	}
 }
