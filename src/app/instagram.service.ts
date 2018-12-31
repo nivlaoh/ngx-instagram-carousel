@@ -18,6 +18,10 @@ export class InstagramService {
 		return forkJoin(obs);
 	}
 
+	getInstagramVideo(shortcode: string) {
+		return this.http.get(`${environment.baseUrl}/instagram/video?shortcode=${shortcode}`);
+	}
+
 	downloadPhotos(tag: string) {
 		return this.http.get(`${environment.baseUrl}/instagram/download?tag=${tag}`, {
 			observe: 'response',

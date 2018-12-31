@@ -5,11 +5,12 @@
 
 export const environment = {
 	production: false,
-	hashtags: ['weitingforyou221218', '白米煮成熟范'],
+	//hashtags: ['weitingforyou221218', '白米煮成熟范'],
+	hashtags: ['video'],
 	title: 'Instagram Carousel',
 	dateOfWedding: [28, 10, 2017],
-	baseUrl: 'http://sentinel-wood.hokaicheng.com:3000',
-	//baseUrl: 'http://localhost:9000',
+	//baseUrl: 'http://sentinel-wood.hokaicheng.com:3000',
+	baseUrl: 'http://localhost:9000',
 	bufferBefore: 4,
 	showDescription: false,
 	slideTiming: 8000,

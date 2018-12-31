@@ -15,6 +15,7 @@ import { InstagramService } from './instagram.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
 	images: any[];
+	videos: any[];
 	@ViewChild('slideshow') slideshow: ElementRef;
 	@ViewChild('swiper') swiper: SwiperComponent;
 	title: string;
@@ -46,6 +47,7 @@ export class AppComponent implements OnInit, OnDestroy {
 		this.isAlive = true;
 		this.weddingDate = [];
 		this.images = [];
+		this.videos = [];
 	}
 
 	ngOnInit() {
@@ -132,13 +134,37 @@ export class AppComponent implements OnInit, OnDestroy {
 					this.swiper.directiveRef.startAutoplay();
 				}, 0);
 			} else {
-				const loadedPics: any[] = media.edges;
+				let loadedPics: any[] = media.edges;
+				loadedPics.forEach(p => {
+					if (p.node.is_video) {
+						if (this.videos.findIndex(i => i.node.id === p.node.id) === -1) {
+							this.instaService.getInstagramVideo(p.node.shortcode).subscribe((r: any) => {
+								const newPost = {
+									node: {
+										is_video: true,
+										...r
+									}
+								};
+								const postIndex = this.images.findIndex(i => i.node.id === r.id);
+								//console.log('video', r.id, postIndex, newPost);
+								
+								if (postIndex !== -1) {
+									this.images.splice(postIndex, 1, newPost);
+								} else {
+									this.images.splice(postIndex, 0, newPost);
+								}
+								this.videos.push(newPost);
+							});
+						}
+					}
+				});
+				this.cdRef.detectChanges();
 				const newImages = loadedPics.filter(t => {
 					return this.images.findIndex(i => i.node.id === t.node.id) === -1;
 				});
 				if (newImages.length > 0) {
 					// this.images.splice.apply(this.images, [currIndex, 0].concat(newImages));
-					console.log('Inserting', newImages.length, 'images in at', currIndex);
+					console.log('Inserting', newImages.length, 'posts at', currIndex);
 					this.images.splice(currIndex + 3, 0, ...newImages);
 					this.cdRef.detectChanges();
 				}
@@ -158,6 +184,10 @@ export class AppComponent implements OnInit, OnDestroy {
 	sanitizeUrl(url: string) {
 		const c = this.domSanitizer.bypassSecurityTrustStyle(`url(${url})`);
 		return c;
+	}
+
+	sanitizeResource(url: string) {
+		return this.domSanitizer.bypassSecurityTrustResourceUrl(url);
 	}
 
 	fullscreen() {

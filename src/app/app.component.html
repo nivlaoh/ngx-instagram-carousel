@@ -13,6 +13,10 @@
 <div class="body-container" fxLayout="row" fxLayoutAlign="center center">
   <mat-card class="wedding-card" fxFlex="60%" fxFlex.lt-md="100%">
     <mat-card-content>
+      <!-- <video class="instagram-pic" width="480" height="360" autoplay>
+        <source src="https://scontent-sin6-1.cdninstagram.com/vp/48bd2009851387fd8a53adcec6a974f8/5C2C7F7F/t50.2886-16/49230760_2092674684146374_4074327477315436544_n.mp4?_nc_ht=scontent-sin6-1.cdninstagram.com" type="video/mp4">
+          Your browser does not support video tag.
+      </video> -->
       <div class="instagram-slideshow" #slideshow>
         <button class="full-screen-btn mat-elevation-z6" mat-icon-button (click)="fullscreen()" mdTooltip="Toggle Fullscreen">
           <mat-icon *ngIf="!isFullscreen">fullscreen</mat-icon>
@@ -23,8 +27,8 @@
             <div class="instagram-pic-holder" fxLayout="row" fxLayoutAlign="center center">
               <div class="blur-bg" [style.background-image]="sanitizeUrl(image?.node?.display_url)"></div>
               <img class="instagram-pic" *ngIf="!image?.node?.is_video" data-src="{{image?.node?.display_url}}">
-              <video class="instagram-pic" *ngIf="image?.node?.is_video">
-                <source [src]="image?.node?.display_url" type="video/mp4">
+              <video class="instagram-pic" *ngIf="image?.node?.video_url" [width]="image?.node?.dimensions?.width" [height]="image?.node?.dimensions?.height" preload autoplay muted loop controls>
+                <source [src]="image?.node?.video_url" type="video/mp4">
                   Your browser does not support video tag.
               </video>
               <div class="instagram-comments" *ngIf="showDescription">
